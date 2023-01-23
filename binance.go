@@ -47,19 +47,17 @@ func BinanceAPI(config *Config, store *BinanceRP) {
 	defer c.Close()
 
 	request := struct {
-		Id     uint     `json:"id"`
+		ID     uint     `json:"id"`
 		Method string   `json:"method"`
 		Params []string `json:"params"`
 	}{
-		Id:     1,
+		ID:     1,
 		Method: "SUBSCRIBE",
 		Params: []string{fmt.Sprintf("%s@ticker", strings.ToLower(config.BinanceMarket))},
 	}
 
 	out, _ := json.Marshal(request)
-
 	log.Printf("requesting binance market information: %#v", string(out))
-
 	if err := c.WriteMessage(websocket.TextMessage, out); err != nil {
 		log.Fatalf("could not write on binance websocket: %v", err)
 	}
@@ -83,7 +81,6 @@ func BinanceAPI(config *Config, store *BinanceRP) {
 		NotA string `json:"A"`
 		NotB string `json:"B"`
 	}{}
-	_ = response
 
 	for {
 		_, message, err := c.ReadMessage()

@@ -7,6 +7,7 @@ require (
 	github.com/gorilla/websocket v1.5.0
 	github.com/jeremyletang/vega-go-sdk v0.0.0-20230120145655-18df6689b7b0
 	github.com/shopspring/decimal v1.3.1
+	golang.org/x/exp v0.0.0-20220722155223-a9213eeb770e
 	google.golang.org/grpc v1.50.1
 )
 

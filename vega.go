@@ -8,6 +8,7 @@ import (
 	"code.vegaprotocol.io/vega/libs/ptr"
 	apipb "code.vegaprotocol.io/vega/protos/data-node/api/v2"
 	vegapb "code.vegaprotocol.io/vega/protos/vega"
+	"golang.org/x/exp/maps"
 	"google.golang.org/grpc"
 )
 
@@ -42,6 +43,12 @@ func (v *VegaStore) SetMarket(market *vegapb.Market) {
 	v.market = market
 }
 
+func (v *VegaStore) GetMarket() *vegapb.Market {
+	v.mu.RLock()
+	defer v.mu.RUnlock()
+	return v.market
+}
+
 func (v *VegaStore) SetMarketData(marketData *vegapb.MarketData) {
 	v.mu.Lock()
 	defer v.mu.Unlock()
@@ -49,11 +56,22 @@ func (v *VegaStore) SetMarketData(marketData *vegapb.MarketData) {
 	v.marketData = marketData
 }
 
+func (v *VegaStore) GetMarketData() *vegapb.MarketData {
+	v.mu.RLock()
+	defer v.mu.RUnlock()
+	return v.marketData
+}
+
 func (v *VegaStore) SetPosition(position *vegapb.Position) {
 	v.mu.Lock()
 	defer v.mu.Unlock()
-
 	v.position = position
+}
+
+func (v *VegaStore) GetPosition() *vegapb.Position {
+	v.mu.RLock()
+	defer v.mu.RUnlock()
+	return v.position
 }
 
 func (v *VegaStore) SetOrders(orders []*vegapb.Order) {
@@ -65,6 +83,32 @@ func (v *VegaStore) SetOrders(orders []*vegapb.Order) {
 	}
 }
 
+func (v *VegaStore) GetOrder(id string) *vegapb.Order {
+	v.mu.RLock()
+	defer v.mu.RUnlock()
+	return v.orders[id]
+}
+
+func (v *VegaStore) GetOrders(id string) []*vegapb.Order {
+	v.mu.RLock()
+	defer v.mu.RUnlock()
+	return maps.Values(v.orders)
+}
+
+func (v *VegaStore) GetLiveOrders(id string) []*vegapb.Order {
+	v.mu.RLock()
+	defer v.mu.RUnlock()
+	out := []*vegapb.Order{}
+	for _, v := range v.orders {
+		if v.Status != vegapb.Order_STATUS_ACTIVE {
+			continue
+		}
+		out = append(out, v)
+	}
+
+	return out
+}
+
 func (v *VegaStore) SetAccounts(accounts []*apipb.AccountBalance) {
 	v.mu.Lock()
 	defer v.mu.Unlock()
@@ -72,6 +116,18 @@ func (v *VegaStore) SetAccounts(accounts []*apipb.AccountBalance) {
 	for _, a := range accounts {
 		v.accounts[a.Type.String()+a.Asset+a.MarketId] = a
 	}
+}
+
+func (v *VegaStore) GetAccount(market, asset string, typ vegapb.AccountType) *apipb.AccountBalance {
+	v.mu.RLock()
+	defer v.mu.RUnlock()
+	return v.accounts[typ.String()+asset+market]
+}
+
+func (v *VegaStore) GetAccounts() []*apipb.AccountBalance {
+	v.mu.RLock()
+	defer v.mu.RUnlock()
+	return maps.Values(v.accounts)
 }
 
 type vegaAPI struct {
