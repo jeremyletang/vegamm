@@ -11,12 +11,14 @@ import (
 )
 
 const (
+	defaultAppPort      = 8080
 	defaultWalletURL    = "http://127.0.0.1:1789"
 	defaultVegaGRPCURL  = "n11.testnet.vega.xyz:3007"
 	defaultBinanceWSURL = "wss://stream.binance.com:443/ws"
 )
 
 var (
+	appPort       uint
 	vegaGRPCURL   string
 	walletURL     string
 	walletToken   string
@@ -27,6 +29,7 @@ var (
 )
 
 func init() {
+	flag.UintVar(&appPort, "port", defaultAppPort, "port of the http API")
 	flag.StringVar(&vegaGRPCURL, "vega-grpc-url", defaultVegaGRPCURL, "a vega grpc server")
 	flag.StringVar(&walletURL, "wallet-url", defaultWalletURL, "a vega wallet service address")
 	flag.StringVar(&walletToken, "wallet-token", "", "a vega wallet token (for info see vega wallet token-api -h)")
@@ -72,8 +75,12 @@ func main() {
 	vegaStore := NewVegaStore()
 	go VegaAPI(config, vegaStore)
 
+	// start the strategy
 	strategy := NewStrategy(w, vegaStore, binanceRefPrice)
 	go strategy.Run()
+
+	// start the state API
+	go StartAPI(config, vegaStore, binanceRefPrice)
 
 	// just waiting for users to close
 	gracefulStop := make(chan os.Signal, 1)

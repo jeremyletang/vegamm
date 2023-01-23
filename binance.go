@@ -29,6 +29,7 @@ func NewBinanceRP(mkt string) *BinanceRP {
 func (b *BinanceRP) Set(bid, ask decimal.Decimal) {
 	b.mu.Lock()
 	defer b.mu.Unlock()
+	log.Printf("reference price updated: bid(%v) ask(%v)", bid, ask)
 	b.bid, b.ask = bid, ask
 }
 

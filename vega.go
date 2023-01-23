@@ -89,13 +89,13 @@ func (v *VegaStore) GetOrder(id string) *vegapb.Order {
 	return v.orders[id]
 }
 
-func (v *VegaStore) GetOrders(id string) []*vegapb.Order {
+func (v *VegaStore) GetOrders() []*vegapb.Order {
 	v.mu.RLock()
 	defer v.mu.RUnlock()
 	return maps.Values(v.orders)
 }
 
-func (v *VegaStore) GetLiveOrders(id string) []*vegapb.Order {
+func (v *VegaStore) GetLiveOrders() []*vegapb.Order {
 	v.mu.RLock()
 	defer v.mu.RUnlock()
 	out := []*vegapb.Order{}
