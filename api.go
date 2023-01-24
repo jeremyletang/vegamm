@@ -28,7 +28,7 @@ func StartAPI(config *Config, vega *VegaStore, refPrice *BinanceRP) {
 			Position:   vega.GetPosition(),
 			Market:     vega.GetMarket(),
 			MarketData: vega.GetMarketData(),
-			Orders:     vega.GetLiveOrders(),
+			Orders:     vega.GetOrders(),
 			Accounts:   vega.GetAccounts(),
 			BestBid:    bid,
 			BestAsk:    ask,

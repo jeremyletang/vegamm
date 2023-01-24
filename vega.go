@@ -79,6 +79,11 @@ func (v *VegaStore) SetOrders(orders []*vegapb.Order) {
 	defer v.mu.Unlock()
 
 	for _, o := range orders {
+		if o.Status != vegapb.Order_STATUS_ACTIVE {
+			delete(v.orders, o.Id)
+			continue
+		}
+
 		v.orders[o.Id] = o
 	}
 }
@@ -93,20 +98,6 @@ func (v *VegaStore) GetOrders() []*vegapb.Order {
 	v.mu.RLock()
 	defer v.mu.RUnlock()
 	return maps.Values(v.orders)
-}
-
-func (v *VegaStore) GetLiveOrders() []*vegapb.Order {
-	v.mu.RLock()
-	defer v.mu.RUnlock()
-	out := []*vegapb.Order{}
-	for _, v := range v.orders {
-		if v.Status != vegapb.Order_STATUS_ACTIVE {
-			continue
-		}
-		out = append(out, v)
-	}
-
-	return out
 }
 
 func (v *VegaStore) SetAccounts(accounts []*apipb.AccountBalance) {
