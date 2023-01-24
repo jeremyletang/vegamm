@@ -1,11 +1,13 @@
 package main
 
 import (
+	"context"
 	"log"
 	"time"
 
 	vegapb "code.vegaprotocol.io/vega/protos/vega"
 	commandspb "code.vegaprotocol.io/vega/protos/vega/commands/v1"
+	walletpb "code.vegaprotocol.io/vega/protos/vega/wallet/v1"
 	"github.com/jeremyletang/vega-go-sdk/wallet"
 	"github.com/shopspring/decimal"
 )
@@ -56,6 +58,17 @@ func RunStrategy(
 				Submissions: append(
 					getOrderSubmission(d, bestBid, vegapb.Side_SIDE_BUY, mktid, bidVol),
 					getOrderSubmission(d, bestAsk, vegapb.Side_SIDE_SELL, mktid, offerVol)...),
+			}
+
+			err := w.SendTransaction(
+				context.Background(), pubkey, &walletpb.SubmitTransactionRequest{
+					Command: &walletpb.SubmitTransactionRequest_BatchMarketInstructions{
+						BatchMarketInstructions: &batch,
+					},
+				},
+			)
+			if err != nil {
+				log.Printf("error submitting batch: %v", err)
 			}
 
 			log.Printf("batch submission: %v", batch.String())
