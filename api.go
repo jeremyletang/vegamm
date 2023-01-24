@@ -19,6 +19,7 @@ type State struct {
 	BestAsk    decimal.Decimal
 	Orders     []*vegapb.Order
 	Accounts   []*apipb.AccountBalance
+	Assets     []*vegapb.Asset
 }
 
 func StartAPI(config *Config, vega *VegaStore, refPrice *BinanceRP) {
@@ -32,6 +33,7 @@ func StartAPI(config *Config, vega *VegaStore, refPrice *BinanceRP) {
 			Accounts:   vega.GetAccounts(),
 			BestBid:    bid,
 			BestAsk:    ask,
+			Assets:     vega.GetAssets(),
 		}
 
 		out, _ := json.Marshal(&state)

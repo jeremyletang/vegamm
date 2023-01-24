@@ -76,8 +76,7 @@ func main() {
 	go VegaAPI(config, vegaStore)
 
 	// start the strategy
-	strategy := NewStrategy(w, vegaStore, binanceRefPrice)
-	go strategy.Run()
+	go RunStrategy(config, w, vegaStore, binanceRefPrice)
 
 	// start the state API
 	go StartAPI(config, vegaStore, binanceRefPrice)

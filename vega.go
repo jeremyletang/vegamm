@@ -27,13 +27,35 @@ type VegaStore struct {
 	orders map[string]*vegapb.Order
 	// position of our party for the given market
 	position *vegapb.Position
+	// assets
+	assets map[string]*vegapb.Asset
 }
 
 func NewVegaStore() *VegaStore {
 	return &VegaStore{
 		accounts: map[string]*apipb.AccountBalance{},
 		orders:   map[string]*vegapb.Order{},
+		assets:   map[string]*vegapb.Asset{},
 	}
+}
+
+func (v *VegaStore) SetAsset(asset *vegapb.Asset) {
+	v.mu.Lock()
+	defer v.mu.Unlock()
+
+	v.assets[asset.Id] = asset
+}
+
+func (v *VegaStore) GetAsset(assetID string) *vegapb.Asset {
+	v.mu.Lock()
+	defer v.mu.Unlock()
+	return v.assets[assetID]
+}
+
+func (v *VegaStore) GetAssets() []*vegapb.Asset {
+	v.mu.Lock()
+	defer v.mu.Unlock()
+	return maps.Values(v.assets)
 }
 
 func (v *VegaStore) SetMarket(market *vegapb.Market) {
@@ -147,6 +169,7 @@ func VegaAPI(config *Config, store *VegaStore) {
 	api.loadAccounts()
 	api.loadOrders()
 	api.loadPosition()
+	api.loadAssets()
 
 	// then we start our streams
 	go api.streamMarketData()
@@ -216,7 +239,7 @@ func (v *vegaAPI) streamOrders() {
 }
 
 func (v *vegaAPI) streamAccounts() {
-	stream, err := v.svc.ObserveAccounts(context.Background(), &apipb.ObserveAccountsRequest{MarketId: v.config.VegaMarket, PartyId: v.config.WalletPubkey})
+	stream, err := v.svc.ObserveAccounts(context.Background(), &apipb.ObserveAccountsRequest{PartyId: v.config.WalletPubkey})
 	if err != nil {
 		log.Fatalf("could not start market data stream: %v", err)
 	}
@@ -254,8 +277,19 @@ func (v *vegaAPI) loadMarketData() {
 	v.store.SetMarketData(resp.MarketData)
 }
 
+func (v *vegaAPI) loadAssets() {
+	resp, err := v.svc.ListAssets(context.Background(), &apipb.ListAssetsRequest{})
+	if err != nil {
+		log.Fatalf("couldn't load the vega market: %v", err)
+	}
+
+	for _, a := range resp.Assets.Edges {
+		v.store.SetAsset(a.Node)
+	}
+}
+
 func (v *vegaAPI) loadAccounts() {
-	resp, err := v.svc.ListAccounts(context.Background(), &apipb.ListAccountsRequest{Filter: &apipb.AccountFilter{PartyIds: []string{v.config.WalletPubkey}, MarketIds: []string{v.config.VegaMarket}}})
+	resp, err := v.svc.ListAccounts(context.Background(), &apipb.ListAccountsRequest{Filter: &apipb.AccountFilter{PartyIds: []string{v.config.WalletPubkey}}})
 	if err != nil {
 		log.Fatalf("couldn't load the vega market: %v", err)
 	}

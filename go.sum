@@ -13,8 +13,8 @@ github.com/gorilla/websocket v1.5.0 h1:PPwGk2jz7EePpoHN/+ClbZu8SPxiqlu12wZP/3sWm
 github.com/gorilla/websocket v1.5.0/go.mod h1:YR8l580nyteQvAITg2hZ9XVh4b55+EU/adAjf1fMHhE=
 github.com/grpc-ecosystem/grpc-gateway/v2 v2.9.0 h1:SLkFeyLhrg86Ny5Wme4MGGace7EHfgsb07uWX/QUGEQ=
 github.com/grpc-ecosystem/grpc-gateway/v2 v2.9.0/go.mod h1:z5aB5opCfWSoAzCrC18hMgjy4oWJ2dPXkn+f3kqTHxI=
-github.com/jeremyletang/vega-go-sdk v0.0.0-20230120145655-18df6689b7b0 h1:/nCvaAmf3kvIE4LdRLy6kKLUz2vAX2fSCo4HQ2sDTB4=
-github.com/jeremyletang/vega-go-sdk v0.0.0-20230120145655-18df6689b7b0/go.mod h1:3Jdpb+oNnscKcz8ooh0/Qqc8UJpGDZQ5ihePy22BBGI=
+github.com/jeremyletang/vega-go-sdk v0.0.0-20230123175705-c0e54d7c02f5 h1:wS1xNgEMVxE4ERHAhU/kA27M+pkRUJJbEQ0q/dpZrcU=
+github.com/jeremyletang/vega-go-sdk v0.0.0-20230123175705-c0e54d7c02f5/go.mod h1:3Jdpb+oNnscKcz8ooh0/Qqc8UJpGDZQ5ihePy22BBGI=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
 github.com/shopspring/decimal v1.3.1 h1:2Usl1nmF/WZucqkFZhnfFYxxxu8LG21F6nPQBE5gKV8=
 github.com/shopspring/decimal v1.3.1/go.mod h1:DKyhrW/HYNuLGql+MJL6WCR6knT2jwCFRcu2hWCYk4o=
