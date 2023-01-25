@@ -52,7 +52,7 @@ go install
 
 ## Use vegamm
 
-vegamm requirement some configuration to be started. The configuration is taken ever from the command line through flags or from the environement. For example, the market to trade on, can be specified through the command line with the following flag `-vega-market` or through the environment with the following variable if specified `VEGAMM_VEGA_MARKET`. The same pattern (note the prefix on the environement variable) is applicable for every arguments.
+vegamm requires some configuration to be started. The configuration is taken from the command line through flags or from the environement. For example, the market to trade on, can be specified through the command line with the following flag `-vega-market` or through the environment with the following variable `VEGAMM_VEGA_MARKET`. The same pattern (note the prefix on the environement variable) is applicable for every arguments.
 
 For example to start the bot against the `UNIDAI.MF21` market on fairground, the following command would be needed:
 ```
