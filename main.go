@@ -48,23 +48,6 @@ func main() {
 		log.Fatalf("could not connect to the wallet: %v", err)
 	}
 
-	// err = w.SendTransaction(
-	// 	context.Background(),
-	// 	config.WalletPubkey,
-	// 	&walletpb.SubmitTransactionRequest{
-	// 		Command: &walletpb.SubmitTransactionRequest_VoteSubmission{
-	// 			VoteSubmission: &commandspb.VoteSubmission{
-	// 				ProposalId: "90e71c52b2f40db78efc24abe4217382993868cd24e45b3dd17147be4afaf884",
-	// 				Value:      vega.Vote_VALUE_NO,
-	// 			},
-	// 		},
-	// 	},
-	// )
-
-	if err != nil {
-		log.Fatalf("error: %v", err)
-	}
-
 	// share binance reference price for the given market
 	binanceRefPrice := NewBinanceRP(config.BinanceMarket)
 

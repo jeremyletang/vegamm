@@ -57,7 +57,8 @@ func RunStrategy(
 				},
 				Submissions: append(
 					getOrderSubmission(d, bestBid, vegapb.Side_SIDE_BUY, mktid, bidVol),
-					getOrderSubmission(d, bestAsk, vegapb.Side_SIDE_SELL, mktid, offerVol)...),
+					getOrderSubmission(d, bestAsk, vegapb.Side_SIDE_SELL, mktid, offerVol)...,
+				),
 			}
 
 			err := w.SendTransaction(
