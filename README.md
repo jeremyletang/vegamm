@@ -59,6 +59,8 @@ For example to start the bot against the `UNIDAI.MF21` market on fairground, the
 vegamm -wallet-token="THE_TOKEN" -wallet-pubkey="YOUR_PUBLIC_KEY" -vega-market="325dfa07e1be5192376616241d23b4d71740fe712e298130bfd35d27738f1ce4" -binance-market="UNIUSDT"
 ```
 
+_*Note*_: For the bots to be able to trade, you'll have to deposit funds on the general account of your public key.
+
 For more information on the available flags you can run:
 ```
 vegamm -help
