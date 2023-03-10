@@ -109,7 +109,7 @@ func getOrderSubmission(
 			MarketId:    mktid,
 			Price:       d.ToMarketPricePrecision(priceF(i)).BigInt().String(),
 			Size:        d.ToMarketPositionPrecision(size).BigInt().Uint64(),
-			Side:        vegapb.Side_SIDE_BUY,
+			Side:        side,
 			TimeInForce: vegapb.Order_TIME_IN_FORCE_GTC,
 			Type:        vegapb.Order_TYPE_LIMIT,
 			Reference:   "VEGA_GO_MM_SIMPLE",
