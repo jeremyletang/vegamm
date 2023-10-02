@@ -218,7 +218,7 @@ func (v *vegaAPI) streamPosition() {
 }
 
 func (v *vegaAPI) streamOrders() {
-	stream, err := v.svc.ObserveOrders(context.Background(), &apipb.ObserveOrdersRequest{MarketId: ptr.From(v.config.VegaMarket), PartyId: ptr.From(v.config.WalletPubkey)})
+	stream, err := v.svc.ObserveOrders(context.Background(), &apipb.ObserveOrdersRequest{MarketIds: []string{v.config.VegaMarket}, PartyIds: []string{v.config.WalletPubkey}})
 	if err != nil {
 		log.Fatalf("could not start market data stream: %v", err)
 	}
@@ -303,7 +303,7 @@ func (v *vegaAPI) loadAccounts() {
 }
 
 func (v *vegaAPI) loadOrders() {
-	resp, err := v.svc.ListOrders(context.Background(), &apipb.ListOrdersRequest{PartyId: ptr.From(v.config.WalletPubkey), MarketId: ptr.From(v.config.VegaMarket), LiveOnly: ptr.From(true)})
+	resp, err := v.svc.ListOrders(context.Background(), &apipb.ListOrdersRequest{Filter: &apipb.OrderFilter{PartyIds: []string{v.config.WalletPubkey}, MarketIds: []string{v.config.VegaMarket}, LiveOnly: ptr.From(true)}})
 	if err != nil {
 		log.Fatalf("couldn't load the vega market: %v", err)
 	}
