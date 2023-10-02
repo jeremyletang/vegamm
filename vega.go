@@ -4,12 +4,15 @@ import (
 	"context"
 	"log"
 	"sync"
+	"time"
 
 	"code.vegaprotocol.io/vega/libs/ptr"
 	apipb "code.vegaprotocol.io/vega/protos/data-node/api/v2"
 	vegapb "code.vegaprotocol.io/vega/protos/vega"
 	"golang.org/x/exp/maps"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
+	"google.golang.org/protobuf/proto"
 )
 
 type VegaStore struct {
@@ -19,6 +22,8 @@ type VegaStore struct {
 	market *vegapb.Market
 	// the market our bot is trading on
 	marketData *vegapb.MarketData
+	// the liquidityProvision for this pubkey
+	liquidityProvision *vegapb.LiquidityProvision
 	// our pubkey accounts
 	// map[type+asset+market]Account
 	accounts map[string]*apipb.AccountBalance
@@ -63,6 +68,13 @@ func (v *VegaStore) SetMarket(market *vegapb.Market) {
 	defer v.mu.Unlock()
 
 	v.market = market
+}
+
+func (v *VegaStore) SetLiquidityProvision(lp *vegapb.LiquidityProvision) {
+	v.mu.RLock()
+	defer v.mu.RUnlock()
+
+	v.liquidityProvision = lp
 }
 
 func (v *VegaStore) GetMarket() *vegapb.Market {
@@ -143,6 +155,12 @@ func (v *VegaStore) GetAccounts() []*apipb.AccountBalance {
 	return maps.Values(v.accounts)
 }
 
+func (v *VegaStore) GetLiquidityProvison() *vegapb.LiquidityProvision {
+	v.mu.RLock()
+	defer v.mu.RUnlock()
+	return proto.Clone(v.liquidityProvision).(*vegapb.LiquidityProvision)
+}
+
 type vegaAPI struct {
 	config *Config
 	store  *VegaStore
@@ -150,7 +168,7 @@ type vegaAPI struct {
 }
 
 func VegaAPI(config *Config, store *VegaStore) {
-	conn, err := grpc.Dial(config.VegaGRPCURL, grpc.WithInsecure())
+	conn, err := grpc.Dial(config.VegaGRPCURL, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Fatalf("could not open connection with vega node: %v", err)
 	}
@@ -170,12 +188,51 @@ func VegaAPI(config *Config, store *VegaStore) {
 	api.loadOrders()
 	api.loadPosition()
 	api.loadAssets()
+	api.loadLP()
 
-	// then we start our streams
-	go api.streamMarketData()
-	go api.streamAccounts()
-	go api.streamOrders()
-	go api.streamPosition()
+	go func() {
+		// then we start our streams
+		go api.streamMarketData()
+		go api.streamAccounts()
+		go api.streamOrders()
+		go api.streamPosition()
+		go api.streamLP()
+	}()
+
+	return
+}
+
+func (v *vegaAPI) loadLP() {
+	resp, err := v.svc.ListLiquidityProvisions(context.Background(), &apipb.ListLiquidityProvisionsRequest{
+		MarketId: ptr.From(v.config.VegaMarket),
+		PartyId:  ptr.From(v.config.WalletPubkey),
+		Live:     ptr.From(true),
+	})
+
+	if err != nil {
+		log.Printf("could not load liquidity provision: %v", err)
+	}
+
+	if len(resp.LiquidityProvisions.Edges) > 0 {
+		v.store.SetLiquidityProvision(resp.LiquidityProvisions.Edges[0].Node)
+	}
+}
+
+func (v *vegaAPI) streamLP() {
+	for range time.NewTicker(5 * time.Second).C {
+		resp, err := v.svc.ListLiquidityProvisions(context.Background(), &apipb.ListLiquidityProvisionsRequest{
+			MarketId: ptr.From(v.config.VegaMarket),
+			PartyId:  ptr.From(v.config.WalletPubkey),
+			Live:     ptr.From(true),
+		})
+		if err != nil {
+			log.Printf("could not load liquidity provision: %v", err)
+		}
+
+		if len(resp.LiquidityProvisions.Edges) > 0 {
+			v.store.SetLiquidityProvision(resp.LiquidityProvisions.Edges[0].Node)
+		}
+	}
 }
 
 func (v *vegaAPI) streamMarketData() {

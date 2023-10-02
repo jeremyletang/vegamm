@@ -14,6 +14,7 @@ type Config struct {
 	WalletPubkey  string
 	VegaMarket    string
 	BinanceMarket string
+	LPFee         string
 }
 
 func parseFlags() *Config {
@@ -47,6 +48,10 @@ func parseFlags() *Config {
 		log.Fatal("error: -binance-market flag is required")
 	}
 
+	if lpFee = getSetting(lpFee, os.Getenv("VEGAMM_LP_FEE")); len(lpFee) <= 0 {
+		log.Fatal("error: -lp-fee flag is required")
+	}
+
 	return &Config{
 		VegaGRPCURL:   vegaGRPCURL,
 		WalletURL:     walletURL,
@@ -55,6 +60,7 @@ func parseFlags() *Config {
 		WalletPubkey:  walletPubkey,
 		VegaMarket:    vegaMarket,
 		BinanceMarket: binanceMarket,
+		LPFee:         lpFee,
 	}
 }
 
