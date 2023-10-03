@@ -227,6 +227,7 @@ func (v *vegaAPI) streamLP() {
 		})
 		if err != nil {
 			log.Printf("could not load liquidity provision: %v", err)
+			continue
 		}
 
 		if len(resp.LiquidityProvisions.Edges) > 0 {
