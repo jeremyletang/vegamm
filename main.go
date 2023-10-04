@@ -13,7 +13,7 @@ import (
 const (
 	defaultAppPort      = 8080
 	defaultWalletURL    = "http://127.0.0.1:1789"
-	defaultVegaGRPCURL  = "n11.testnet.vega.xyz:3007"
+	defaultVegaGRPCURL  = "n07.testnet.vega.xyz:3007"
 	defaultBinanceWSURL = "wss://stream.binance.com:443/ws"
 )
 
@@ -26,6 +26,7 @@ var (
 	binanceWSURL  string
 	vegaMarket    string
 	binanceMarket string
+	lpFee         string
 )
 
 func init() {
@@ -37,6 +38,7 @@ func init() {
 	flag.StringVar(&binanceWSURL, "binance-ws-url", defaultBinanceWSURL, "binance websocket url")
 	flag.StringVar(&vegaMarket, "vega-market", "", "a vega market id")
 	flag.StringVar(&binanceMarket, "binance-market", "", "a binance market symbol")
+	flag.StringVar(&lpFee, "lp-fee", "0.001", "the required fee for the liquidity commitment")
 }
 
 func main() {
@@ -56,7 +58,7 @@ func main() {
 
 	// start the vega API stuff
 	vegaStore := NewVegaStore()
-	go VegaAPI(config, vegaStore)
+	VegaAPI(config, vegaStore)
 
 	// start the strategy
 	go RunStrategy(config, w, vegaStore, binanceRefPrice)
